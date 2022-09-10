@@ -60,7 +60,7 @@ jobs:
         EOF
     - name: Test Build
       run: |
-        nix-build -A '((import <nixpkgs> {}).callPackage (import ./default.nix) { })'
+        nix-build -E '((import <nixpkgs> {}).callPackage (import ./default.nix) { })'
     - name: Upload nixpkgs source
       uses: actions/upload-artifact@v3.1.0
       with:
@@ -75,4 +75,4 @@ jobs:
       with:
         name: nixpkgs-result-${{ env.NIXPKGS_NAME }}-${{ env.NIXPKGS_VER }}-${{ github.run_id }}
         path: |
-          result
+          ./result
