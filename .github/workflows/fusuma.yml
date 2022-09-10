@@ -1,0 +1,78 @@
+name: "Fusuma"
+on:
+  workflow_dispatch:
+  
+env:
+  NIXPKGS_NAME: "fusuma"
+  NIXPKGS_VER: "2.4.1"
+  NIXPKGS_DESC: "Multitouch gestures with libinput driver on X11, Linux"
+  NIXPKGS_URL: "https://github.com/iberianpig/fusuma"
+
+jobs:
+  nixpkgs-fusuma:
+    name: Fusuma
+    runs-on: ubuntu-latest
+    steps:
+    - name: Install Nix
+      uses: cachix/install-nix-action@v17
+      with:
+        nix_path: nixpkgs=channel:nixos-unstable
+    - name: Generate Gemfile
+      run: |
+        cat <<\EOF > ./Gemfile
+        source 'https://rubygems.org'
+        gem '${{ env.NIXPKGS_NAME }}', '${{ env.NIXPKGS_VER }}'
+        EOF
+    - name: Generate Gemfile.lock
+      run: |
+        nix-shell -p ruby bundix --run "bundle install"
+    - name: Generate gemset.nix
+      run: |
+        nix-shell -p ruby bundix --run "bundix"
+    # Current default.nix
+    - name: Generate default.nix
+      run: |
+        cat <<\EOF > ./default.nix
+        { lib, bundlerApp, bundlerUpdateScript, makeWrapper, libinput }:
+        
+        bundlerApp {
+          pname = "${{ env.NIXPKGS_NAME }}";
+          gemdir = ./.;
+          exes = [ "${{ env.NIXPKGS_NAME }}" ];
+          
+          nativeBuildInputs = [ makeWrapper ];
+          
+          postBuild = ''
+            wrapProgram "$out/bin/${{ env.NIXPKGS_NAME }}" \
+            --prefix PATH : ${lib.makeBinPath [ libinput ]}
+            '';
+            
+          passthru.updateScript = bundlerUpdateScript "${{ env.NIXPKGS_NAME }}";
+        
+          meta = with lib; {
+            description = "${{ env.NIXPKGS_DESC }}";
+            homepage = "${{ env.NIXPKGS_URL }}";
+            license = licenses.mit;
+            maintainers = with maintainers; [ jfrankenau nicknovitski Br1ght0ne ];
+            platforms = platforms.linux;
+          };
+        }
+        EOF
+    - name: Test Build
+      run: |
+        nix-build -E '((import <nixpkgs> {}).callPackage (import ./default.nix) { })'
+    - name: Upload nixpkgs source
+      uses: actions/upload-artifact@v3.1.0
+      with:
+        name: nixpkgs-source-${{ env.NIXPKGS_NAME }}-${{ env.NIXPKGS_VER }}-${{ github.run_id }}
+        path: |
+          ./Gemfile
+          ./Gemfile.lock
+          ./gemset.nix
+          ./default.nix
+    - name: Upload nixpkgs result
+      uses: actions/upload-artifact@v3.1.0
+      with:
+        name: nixpkgs-result-${{ env.NIXPKGS_NAME }}-${{ env.NIXPKGS_VER }}-${{ github.run_id }}
+        path: |
+          /nix/store/*${{ env.NIXPKGS_NAME }}*/**
