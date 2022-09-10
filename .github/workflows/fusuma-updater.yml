@@ -1,12 +1,6 @@
 name: "Fusuma Test Updater"
 on:
   workflow_dispatch:
-  
-env:
-  NIXPKGS_NAME: "fusuma"
-  NIXPKGS_VER: "2.4.1"
-  NIXPKGS_DESC: "Multitouch gestures with libinput driver on X11, Linux"
-  NIXPKGS_URL: "https://github.com/iberianpig/fusuma"
 
 jobs:
   nixpkgs-fusuma:
@@ -26,8 +20,8 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v3.0.2
       with:
-        repository: lazygeniusman/nixpkgs
-        ref: fusuma-test
+        repository: NixOS/nixpkgs
+        ref: master
     - name: Test Updater
       run: |
-        nixpkgs-update update "fusuma 2.4.0 2.4.1"
+        nixpkgs-update update "fusuma 1.3.0 2.4.1"
