@@ -61,6 +61,8 @@ jobs:
     - name: Test Build
       run: |
         nix-build -E '((import <nixpkgs> {}).callPackage (import ./default.nix) { })'
+    - name: Get result full path
+      run: echo "::set-env name=NIXPKGS_RESULT::$(readlink result)"
     - name: Upload nixpkgs source
       uses: actions/upload-artifact@v3.1.0
       with:
@@ -70,10 +72,8 @@ jobs:
           ./Gemfile.lock
           ./gemset.nix
           ./default.nix
-    - run: readlink result
     - name: Upload nixpkgs result
       uses: actions/upload-artifact@v3.1.0
       with:
         name: nixpkgs-result-${{ env.NIXPKGS_NAME }}-${{ env.NIXPKGS_VER }}-${{ github.run_id }}
-        path: |
-          ./result
+        path: ${{ env.NIXPKGS_RESULT }}
