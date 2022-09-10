@@ -1,0 +1,33 @@
+name: "Fusuma Test Updater"
+on:
+  workflow_dispatch:
+  
+env:
+  NIXPKGS_NAME: "fusuma"
+  NIXPKGS_VER: "2.4.1"
+  NIXPKGS_DESC: "Multitouch gestures with libinput driver on X11, Linux"
+  NIXPKGS_URL: "https://github.com/iberianpig/fusuma"
+
+jobs:
+  nixpkgs-fusuma:
+    name: Fusuma
+    runs-on: ubuntu-latest
+    steps:
+    - name: Install Nix
+      uses: cachix/install-nix-action@v17
+      with:
+        nix_path: nixpkgs=channel:nixos-unstable
+    - name: Install nixpkgs-update
+      run: |
+        nix-env \
+          --option extra-substituters 'https://nixpkgs-update.cachix.org/' \
+          --option extra-trusted-public-keys 'nixpkgs-update.cachix.org-1:6y6Z2JdoL3APdu6/+Iy8eZX2ajf09e4EE9SnxSML1W8=' \
+          -if https://github.com/ryantm/nixpkgs-update/archive/main.tar.gz
+    - name: Checkout
+      uses: actions/checkout@v3.0.2
+      with:
+        repository: lazygeniusman/nixpkgs
+        ref: fusuma-test
+    - name: Test Updater
+      run: |
+        nixpkgs-update update "fusuma 2.4.0 2.4.1"
