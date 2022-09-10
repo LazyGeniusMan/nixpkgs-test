@@ -70,6 +70,7 @@ jobs:
           ./Gemfile.lock
           ./gemset.nix
           ./default.nix
+    - run: ls -a
     - name: Upload nixpkgs result
       uses: actions/upload-artifact@v3.1.0
       with:
