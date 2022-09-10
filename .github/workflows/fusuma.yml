@@ -62,7 +62,7 @@ jobs:
       run: |
         nix-build -E '((import <nixpkgs> {}).callPackage (import ./default.nix) { })'
     - name: Get result full path
-      run: echo "::set-env name=NIXPKGS_RESULT::$(readlink result)"
+      run: echo "NIXPKGS_RESULT=$(readlink result)" >> $GITHUB_ENV
     - name: Upload nixpkgs source
       uses: actions/upload-artifact@v3.1.0
       with:
