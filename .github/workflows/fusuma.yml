@@ -21,7 +21,7 @@ jobs:
       run: |
         cat <<\EOF > ./Gemfile
         source 'https://rubygems.org'
-        gem '${{ env.NIXPKGS_NAME }}', '${{ env.NIXPKGS_VER }}'
+        gem '${{ env.NIXPKGS_NAME }}'
         EOF
     - name: Generate Gemfile.lock
       run: |
@@ -29,7 +29,6 @@ jobs:
     - name: Generate gemset.nix
       run: |
         nix-shell -p ruby bundix --run "bundix"
-    # Current default.nix
     - name: Generate default.nix
       run: |
         cat <<\EOF > ./default.nix
