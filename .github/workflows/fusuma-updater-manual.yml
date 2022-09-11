@@ -1,0 +1,46 @@
+name: "Fusuma Updater"
+on:
+  workflow_dispatch:
+  
+env:
+  NIXPKGS_REPO: "LazyGeniusMan/nixpkgs"
+  NIXPKGS_BRANCH: "master"
+  NIXPKGS_NAME: "fusuma"
+  NIXPKGS_VER_OLD: "1.3.0"
+  NIXPKGS_VER_NEW: "2.4.1"
+  NIXPKGS_DIR: "./pkgs/tools/inputmethods/fusuma"
+
+jobs:
+  nixpkgs-fusuma-updater:
+    name: Fusuma Updater
+    runs-on: ubuntu-latest
+    steps:
+    - name: Install Nix
+      uses: cachix/install-nix-action@v17
+      with:
+        nix_path: nixpkgs=channel:nixos-unstable
+    - name: Checkout
+      run: |
+        git clone https://${{ secrets.PAT }}@github.com/LazyGeniusMan/nixpkgs.git nixpkgs
+        cd nixpkgs
+        git branch ${{ env.NIXPKGS_NAME }}-${{ env.NIXPKGS_VER_NEW }}-${{ github.run_id }}
+        git checkout ${{ env.NIXPKGS_NAME }}-${{ env.NIXPKGS_VER_NEW }}-${{ github.run_id }}
+    - name: Update
+      run: |
+        cd ${{ env.NIXPKGS_DIR }}
+        nix-shell -p ruby bundix --run "bundler update"
+        nix-shell -p ruby bundix --run "bundix -l"
+    - name: Upload nixpkgs source
+      uses: actions/upload-artifact@v3.1.0
+      with:
+        name: nixpkgs-source-${{ env.NIXPKGS_NAME }}-${{ env.NIXPKGS_VER_NEW }}-${{ github.run_id }}
+        path: |
+          ${{ env.NIXPKGS_DIR }}/Gemfile
+          ${{ env.NIXPKGS_DIR }}/Gemfile.lock
+          ${{ env.NIXPKGS_DIR }}/gemset.nix
+          ${{ env.NIXPKGS_DIR }}/default.nix
+    - name: Commit
+      run: |
+        git commit -m "${{ env.NIXPKGS_NAME }}: ${{ env.NIXPKGS_VER_OLD }} -> ${{ env.NIXPKGS_VER_NEW }}"
+        git add .
+        git push https://${{ secrets.PAT }}@github.com/LazyGeniusMan/nixpkgs.git
