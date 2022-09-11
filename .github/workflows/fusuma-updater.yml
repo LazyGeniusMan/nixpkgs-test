@@ -33,7 +33,8 @@ jobs:
         nix-shell -p ruby bundix --run "bundix -l"
     - name: Build
       run: |
-        nix-build -E '((import <nixpkgs> {}).callPackage (import ./default.nix) { })'
+        cd ${{ env.GITHUB_WORKSPACE }}
+        nix-build -A ${{ env.NIXPKGS_NAME }}
     - name: Get result full path
       run: echo "NIXPKGS_RESULT=$(readlink result)" >> $GITHUB_ENV
     - name: Upload nixpkgs source
