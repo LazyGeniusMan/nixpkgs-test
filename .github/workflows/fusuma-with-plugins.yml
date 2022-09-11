@@ -53,7 +53,7 @@ jobs:
             description = "Multitouch gestures with libinput driver on X11, Linux";
             homepage = "https://github.com/iberianpig/fusuma";
             license = licenses.mit;
-            maintainers = with maintainers; [ jfrankenau nicknovitski Br1ght0ne ];
+            maintainers = with maintainers; [ jfrankenau nicknovitski Br1ght0ne lazygeniusman ];
             platforms = platforms.linux;
           };
         }
@@ -129,13 +129,7 @@ jobs:
         cd ${{ env.NIXPKGS_DIR }}
         cat <<\EOF > plugins.nix
         { lib, bundlerApp, bundlerUpdateScript, makeWrapper, fusuma, libinput }:
-        let 
-          mkPlugin = name: bundlerApp.mkDerivation {
-          name = "fusuma-${fusuma.version}-${name}";
-          inherit (fusuma) src;
-          buildInputs = [ fusuma ];
-        };
-        in {
+        {
           appmatcher = bundlerApp {
             pname = "fusuma-plugin-appmatcher";
             gemdir = ./fusuma-plugin-appmatcher;
@@ -145,7 +139,7 @@ jobs:
             
             postBuild = ''
             wrapProgram "$out/bin/fusuma-appmatcher" \
-              --prefix PATH : ${lib.makeBinPath [ libinput ]}
+              --prefix PATH : ${lib.makeBinPath [ libinput fusuma ]}
               '';
               
             passthru.updateScript = bundlerUpdateScript "fusuma-plugin-appmatcher";
@@ -154,7 +148,7 @@ jobs:
               description = "Configure app-specific gestures plugin for Fusuma";
               homepage = "https://github.com/iberianpig/fusuma-plugin-appmatcher";
               license = licenses.mit;
-              maintainers = with maintainers; [ jfrankenau nicknovitski Br1ght0ne ];
+              maintainers = with maintainers; [ lazygeniusman ];
               platforms = platforms.linux;
             };
           };
@@ -168,7 +162,7 @@ jobs:
             
             postBuild = ''
             wrapProgram "$out/bin/fusuma-appmatcher" \
-              --prefix PATH : ${lib.makeBinPath [ libinput ]}
+              --prefix PATH : ${lib.makeBinPath [ libinput fusuma ]}
             '';
             
             passthru.updateScript = bundlerUpdateScript "fusuma-plugin-keypress";
@@ -177,7 +171,7 @@ jobs:
               description = "Keypress combination plugin for Fusuma";
               homepage = "https://github.com/iberianpig/fusuma-plugin-keypress";
               license = licenses.mit;
-              maintainers = with maintainers; [ jfrankenau nicknovitski Br1ght0ne ];
+              maintainers = with maintainers; [ lazygeniusman ];
               platforms = platforms.linux;
             };
           };
@@ -191,7 +185,7 @@ jobs:
             
             postBuild = ''
             wrapProgram "$out/bin/fusuma-sendkey" \
-              --prefix PATH : ${lib.makeBinPath [ libinput ]}
+              --prefix PATH : ${lib.makeBinPath [ libinput fusuma ]}
             '';
             
             passthru.updateScript = bundlerUpdateScript "fusuma-plugin-sendkey";
@@ -200,7 +194,7 @@ jobs:
               description = "Send virtual keyboard events plugin for Fusuma";
               homepage = "https://github.com/iberianpig/fusuma-plugin-sendkey";
               license = licenses.mit;
-              maintainers = with maintainers; [ jfrankenau nicknovitski Br1ght0ne ];
+              maintainers = with maintainers; [ lazygeniusman ];
               platforms = platforms.linux;
             };
           };
@@ -214,7 +208,7 @@ jobs:
             
             postBuild = ''
             wrapProgram "$out/bin/fusuma-tap" \
-              --prefix PATH : ${lib.makeBinPath [ libinput ]}
+              --prefix PATH : ${lib.makeBinPath [ libinput fusuma ]}
             '';
             
             passthru.updateScript = bundlerUpdateScript "fusuma-plugin-tap";
@@ -223,7 +217,7 @@ jobs:
               description = "Recognize multitouch tap plugin for Fusuma";
               homepage = "https://github.com/iberianpig/fusuma-plugin-tap";
               license = licenses.mit;
-              maintainers = with maintainers; [ jfrankenau nicknovitski Br1ght0ne ];
+              maintainers = with maintainers; [ lazygeniusman ];
               platforms = platforms.linux;
             };
           };
@@ -237,7 +231,7 @@ jobs:
             
             postBuild = ''
             wrapProgram "$out/bin/fusuma-wmctrl" \
-              --prefix PATH : ${lib.makeBinPath [ libinput ]}
+              --prefix PATH : ${lib.makeBinPath [ libinput fusuma ]}
             '';
             
             passthru.updateScript = bundlerUpdateScript "fusuma-plugin-wmctrl";
@@ -246,7 +240,7 @@ jobs:
               description = "Window Manager plugin for Fusuma";
               homepage = "https://github.com/iberianpig/fusuma-plugin-wmctrl";
               license = licenses.mit;
-              maintainers = with maintainers; [ jfrankenau nicknovitski Br1ght0ne ];
+              maintainers = with maintainers; [ lazygeniusman ];
               platforms = platforms.linux;
             };
           };
@@ -258,21 +252,21 @@ jobs:
         name: nixpkgs-source-${{ env.NIXPKGS_NAME }}-${{ env.NIXPKGS_VER_NEW }}-${{ github.run_id }}
         path: |
           ${{ env.NIXPKGS_DIR }}/**
-    - name: Build fusuma-plugin-appmatcher
-      run: |
-        nix-build -A fusuma-plugin-appmatcher
-    - name: Build fusuma-plugin-keypress
-      run: |
-        nix-build -A fusuma-plugin-keypress
-    - name: Build fusuma-plugin-sendkey
-      run: |
-        nix-build -A fusuma-plugin-sendkey
-    - name: Build fusuma-plugin-tap
-      run: |
-        nix-build -A fusuma-plugin-tap
-    - name: Build fusuma-plugin-wmctrl
-      run: |
-        nix-build -A fusuma-plugin-wmctrl
+    #- name: Build fusuma-plugin-appmatcher
+    #  run: |
+    #    nix-build -A fusuma-plugin-appmatcher
+    #- name: Build fusuma-plugin-keypress
+    #  run: |
+    #    nix-build -A fusuma-plugin-keypress
+    #- name: Build fusuma-plugin-sendkey
+    #  run: |
+    #    nix-build -A fusuma-plugin-sendkey
+    #- name: Build fusuma-plugin-tap
+    #  run: |
+    #    nix-build -A fusuma-plugin-tap
+    #- name: Build fusuma-plugin-wmctrl
+    #  run: |
+    #    nix-build -A fusuma-plugin-wmctrl
     - name: Get result full path
       run: echo "NIXPKGS_RESULT=$(readlink result)" >> $GITHUB_ENV
     - name: Upload nixpkgs result
@@ -280,13 +274,13 @@ jobs:
       with:
         name: nixpkgs-result-${{ env.NIXPKGS_NAME }}-${{ env.NIXPKGS_VER_NEW }}-${{ github.run_id }}
         path: ${{ env.NIXPKGS_RESULT }}
-    #- name: Commit to new branch
-    #  uses: EndBug/add-and-commit@v9.1.0
-    #  with:
-    #    author_name: ${{ secrets.GIT_NAME }}
-    #    author_email: ${{ secrets.GIT_EMAIL }}
-    #    committer_name: ${{ secrets.GIT_NAME }}
-    #    committer_email: ${{ secrets.GIT_EMAIL }}
-    #    message: "${{ env.NIXPKGS_NAME }}: ${{ env.NIXPKGS_VER_OLD }} -> ${{ env.NIXPKGS_VER_NEW }}"
-    #    new_branch: ${{ env.NIXPKGS_NAME }}-${{ env.NIXPKGS_VER_NEW }}-${{ github.run_id }}
-    #    github_token: ${{ secrets.PAT }}
+    - name: Commit to new branch
+      uses: EndBug/add-and-commit@v9.1.0
+      with:
+        author_name: ${{ secrets.GIT_NAME }}
+        author_email: ${{ secrets.GIT_EMAIL }}
+        committer_name: ${{ secrets.GIT_NAME }}
+        committer_email: ${{ secrets.GIT_EMAIL }}
+        message: "${{ env.NIXPKGS_NAME }}: ${{ env.NIXPKGS_VER_OLD }} -> ${{ env.NIXPKGS_VER_NEW }}"
+        new_branch: ${{ env.NIXPKGS_NAME }}-${{ env.NIXPKGS_VER_NEW }}-${{ github.run_id }}
+        github_token: ${{ secrets.PAT }}
