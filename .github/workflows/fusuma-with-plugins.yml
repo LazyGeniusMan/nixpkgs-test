@@ -158,14 +158,7 @@ jobs:
             pname = "fusuma-plugin-keypress";
             gemdir = ./fusuma-plugin-keypress;
             exes = [ "fusuma-keypress" ];
-            
-            nativeBuildInputs = [ makeWrapper ];
-            
-            postBuild = ''
-            wrapProgram "$out/bin/fusuma-keypress" \
-              --prefix PATH : ${lib.makeBinPath [ libinput fusuma ]}
-            '';
-            
+                                    
             passthru.updateScript = bundlerUpdateScript "fusuma-plugin-keypress";
             
             meta = with lib; {
@@ -204,14 +197,7 @@ jobs:
             pname = "fusuma-plugin-tap";
             gemdir = ./fusuma-plugin-tap;
             exes = [ "fusuma-tap" ];
-            
-            nativeBuildInputs = [ makeWrapper ];
-            
-            postBuild = ''
-            wrapProgram "$out/bin/fusuma-tap" \
-              --prefix PATH : ${lib.makeBinPath [ libinput fusuma ]}
-            '';
-            
+                                               
             passthru.updateScript = bundlerUpdateScript "fusuma-plugin-tap";
             
             meta = with lib; {
