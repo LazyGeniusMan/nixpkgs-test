@@ -245,6 +245,7 @@ jobs:
               platforms = platforms.linux;
             };
           };
+        }
         EOF
         cd ${{ github.workspace }}
     - name: Upload nixpkgs source
