@@ -1,4 +1,4 @@
-name: "Fusuma - Plugins"
+name: "Fusuma With Plugins"
 on:
   workflow_dispatch:
   
@@ -6,13 +6,12 @@ env:
   NIXPKGS_REPO: "LazyGeniusMan/nixpkgs"
   NIXPKGS_BRANCH: "master"
   NIXPKGS_NAME: "fusuma"
-  NIXPKGS_VER_OLD: "1.3.0"
   NIXPKGS_VER_NEW: "2.4.1"
   NIXPKGS_DIR: "./pkgs/tools/inputmethods/fusuma"
 
 jobs:
-  fusuma-plugins:
-    name: Fusuma - Plugins
+  fusuma-with-plugins:
+    name: Fusuma With Plugins
     runs-on: ubuntu-latest
     steps:
     - name: Install Nix
@@ -26,10 +25,10 @@ jobs:
         ref: ${{ env.NIXPKGS_BRANCH }}
         token: ${{ secrets.PAT }}
         fetch-depth: 1
-    - name: Remove old main package
+    - name: Remove old fusuma
       run: |
         rm -rf ${{ env.NIXPKGS_DIR }}
-    - name: generate new main package
+    - name: generate new fusuma gem
       run: |
         mkdir -p ${{ env.NIXPKGS_DIR }}/fusuma
         cd ${{ env.NIXPKGS_DIR }}
@@ -62,14 +61,206 @@ jobs:
         cd fusuma
         cat <<\EOF > Gemfile
         source 'https://rubygems.org'
-        gem "fusuma"
+        gem 'fusuma'
         EOF
         nix-shell -p ruby bundix --run "bundler install"
         nix-shell -p ruby bundix --run "bundix -l"
-    - name: Build Main Package
-      run: |
         cd ${{ github.workspace }}
+    - name: Build fusuma
+      run: |
         nix-build -A ${{ env.NIXPKGS_NAME }}
+    - name: Generate fusuma-plugin-appmatcher gem
+      run: |
+        mkdir -p ${{ env.NIXPKGS_DIR }}/fusuma-plugin-appmatcher
+        cd ${{ env.NIXPKGS_DIR }}/fusuma-plugin-appmatcher
+        cat <<\EOF > Gemfile
+        source 'https://rubygems.org'
+        gem 'fusuma-plugin-appmatcher'
+        EOF
+        nix-shell -p ruby bundix --run "bundler install"
+        nix-shell -p ruby bundix --run "bundix -l"
+        cd ${{ github.workspace }}
+    - name: Generate fusuma-plugin-keypress gem
+      run: |
+        mkdir -p ${{ env.NIXPKGS_DIR }}/fusuma-plugin-keypress
+        cd ${{ env.NIXPKGS_DIR }}/fusuma-plugin-keypress
+        cat <<\EOF > Gemfile
+        source 'https://rubygems.org'
+        gem 'fusuma-plugin-keypress'
+        EOF
+        nix-shell -p ruby bundix --run "bundler install"
+        nix-shell -p ruby bundix --run "bundix -l"
+        cd ${{ github.workspace }}
+    - name: Generate fusuma-plugin-sendkey gem
+      run: |
+        mkdir -p ${{ env.NIXPKGS_DIR }}/fusuma-plugin-sendkey
+        cd ${{ env.NIXPKGS_DIR }}/fusuma-plugin-sendkey
+        cat <<\EOF > Gemfile
+        source 'https://rubygems.org'
+        gem 'fusuma-plugin-sendkey'
+        EOF
+        nix-shell -p ruby bundix --run "bundler install"
+        nix-shell -p ruby bundix --run "bundix -l"
+        cd ${{ github.workspace }}
+    - name: Generate fusuma-plugin-tap gem
+      run: |
+        mkdir -p ${{ env.NIXPKGS_DIR }}/fusuma-plugin-tap
+        cd ${{ env.NIXPKGS_DIR }}/fusuma-plugin-tap
+        cat <<\EOF > Gemfile
+        source 'https://rubygems.org'
+        gem 'fusuma-plugin-tap'
+        EOF
+        nix-shell -p ruby bundix --run "bundler install"
+        nix-shell -p ruby bundix --run "bundix -l"
+        cd ${{ github.workspace }}
+    - name: Generate fusuma-plugin-wmctrl gem
+      run: |
+        mkdir -p ${{ env.NIXPKGS_DIR }}/fusuma-plugin-wmctrl
+        cd ${{ env.NIXPKGS_DIR }}/fusuma-plugin-wmctrl
+        cat <<\EOF > Gemfile
+        source 'https://rubygems.org'
+        gem 'fusuma-plugin-wmctrl'
+        EOF
+        nix-shell -p ruby bundix --run "bundler install"
+        nix-shell -p ruby bundix --run "bundix -l"
+        cd ${{ github.workspace }}
+    - name: Generate plugins.nix
+      run: |
+        cd ${{ env.NIXPKGS_DIR }}
+        cat <<\EOF > plugins.nix
+        { lib, bundlerApp, bundlerUpdateScript, makeWrapper, libinput }:
+        
+        appmatcher = bundlerApp {
+          pname = "fusuma-plugin-appmatcher";
+          gemdir = ./fusuma-plugin-appmatcher;
+          exes = [ "fusuma-appmatcher" ];
+
+          nativeBuildInputs = [ makeWrapper ];
+
+          postBuild = ''
+          wrapProgram "$out/bin/fusuma-appmatcher" \
+            --prefix PATH : ${lib.makeBinPath [ libinput ]}
+          '';
+
+          passthru.updateScript = bundlerUpdateScript "fusuma-plugin-appmatcher";
+
+          meta = with lib; {
+            description = "Configure app-specific gestures plugin for Fusuma";
+            homepage = "https://github.com/iberianpig/fusuma-plugin-appmatcher";
+            license = licenses.mit;
+            maintainers = with maintainers; [ jfrankenau nicknovitski Br1ght0ne ];
+            platforms = platforms.linux;
+          };
+        }
+        
+        keypress = bundlerApp {
+          pname = "fusuma-plugin-keypress";
+          gemdir = ./fusuma-plugin-keypress;
+          exes = [ "fusuma-keypress" ];
+
+          nativeBuildInputs = [ makeWrapper ];
+
+          postBuild = ''
+          wrapProgram "$out/bin/fusuma-appmatcher" \
+            --prefix PATH : ${lib.makeBinPath [ libinput ]}
+          '';
+
+          passthru.updateScript = bundlerUpdateScript "fusuma-plugin-keypress";
+
+          meta = with lib; {
+            description = "Keypress combination plugin for Fusuma";
+            homepage = "https://github.com/iberianpig/fusuma-plugin-keypress";
+            license = licenses.mit;
+            maintainers = with maintainers; [ jfrankenau nicknovitski Br1ght0ne ];
+            platforms = platforms.linux;
+          };
+        }
+        
+        sendkey = bundlerApp {
+          pname = "fusuma-plugin-sendkey";
+          gemdir = ./fusuma-plugin-sendkey;
+          exes = [ "fusuma-sendkey" ];
+
+          nativeBuildInputs = [ makeWrapper ];
+
+          postBuild = ''
+          wrapProgram "$out/bin/fusuma-sendkey" \
+            --prefix PATH : ${lib.makeBinPath [ libinput ]}
+          '';
+
+          passthru.updateScript = bundlerUpdateScript "fusuma-plugin-sendkey";
+
+          meta = with lib; {
+            description = "Send virtual keyboard events plugin for Fusuma";
+            homepage = "https://github.com/iberianpig/fusuma-plugin-sendkey";
+            license = licenses.mit;
+            maintainers = with maintainers; [ jfrankenau nicknovitski Br1ght0ne ];
+            platforms = platforms.linux;
+          };
+        }
+        
+        tap = bundlerApp {
+          pname = "fusuma-plugin-tap";
+          gemdir = ./fusuma-plugin-tap;
+          exes = [ "fusuma-tap" ];
+
+          nativeBuildInputs = [ makeWrapper ];
+
+          postBuild = ''
+          wrapProgram "$out/bin/fusuma-tap" \
+            --prefix PATH : ${lib.makeBinPath [ libinput ]}
+          '';
+
+          passthru.updateScript = bundlerUpdateScript "fusuma-plugin-tap";
+
+          meta = with lib; {
+            description = "Recognize multitouch tap plugin for Fusuma";
+            homepage = "https://github.com/iberianpig/fusuma-plugin-tap";
+            license = licenses.mit;
+            maintainers = with maintainers; [ jfrankenau nicknovitski Br1ght0ne ];
+            platforms = platforms.linux;
+          };
+        }
+        
+        wmctrl = bundlerApp {
+          pname = "fusuma-plugin-wmctrl";
+          gemdir = ./fusuma-plugin-wmctrl;
+          exes = [ "fusuma-wmctrl" ];
+
+          nativeBuildInputs = [ makeWrapper ];
+
+          postBuild = ''
+          wrapProgram "$out/bin/fusuma-wmctrl" \
+            --prefix PATH : ${lib.makeBinPath [ libinput ]}
+          '';
+
+          passthru.updateScript = bundlerUpdateScript "fusuma-plugin-wmctrl";
+
+          meta = with lib; {
+            description = "Window Manager plugin for Fusuma";
+            homepage = "https://github.com/iberianpig/fusuma-plugin-wmctrl";
+            license = licenses.mit;
+            maintainers = with maintainers; [ jfrankenau nicknovitski Br1ght0ne ];
+            platforms = platforms.linux;
+          };
+        }
+        EOF
+        cd ${{ github.workspace }}
+     name: Build fusuma-plugin-appmatcher
+      run: |
+        nix-build -A fusuma-plugin-appmatcher
+    - name: Generate fusuma-plugin-keypress
+      run: |
+        nix-build -A fusuma-plugin-keypress
+    - name: Generate fusuma-plugin-sendkey
+      run: |
+        nix-build -A fusuma-plugin-sendkey
+    - name: Generate fusuma-plugin-tap
+      run: |
+        nix-build -A fusuma-plugin-tap
+    - name: Generate fusuma-plugin-wmctrl
+      run: |
+        nix-build -A fusuma-plugin-wmctrl
     - name: Get result full path
       run: echo "NIXPKGS_RESULT=$(readlink result)" >> $GITHUB_ENV
     - name: Upload nixpkgs source
