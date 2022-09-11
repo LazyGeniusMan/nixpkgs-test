@@ -39,7 +39,7 @@ jobs:
     - name: Test Updater
       run: |
         cd pkgs/tools/inputmethods/fusuma
-        nix-env -p ruby bundix --run bundix -l
+        nix-shell -p ruby bundix --run bundix -l
     - name: Upload nixpkgs source
       uses: actions/upload-artifact@v3.1.0
       with:
