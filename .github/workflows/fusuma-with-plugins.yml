@@ -6,6 +6,7 @@ env:
   NIXPKGS_REPO: "LazyGeniusMan/nixpkgs"
   NIXPKGS_BRANCH: "master"
   NIXPKGS_NAME: "fusuma"
+  NIXPKGS_VER_OLD: "1.3.0"
   NIXPKGS_VER_NEW: "2.4.1"
   NIXPKGS_DIR: "./pkgs/tools/inputmethods/fusuma"
 
@@ -281,6 +282,6 @@ jobs:
         author_email: ${{ secrets.GIT_EMAIL }}
         committer_name: ${{ secrets.GIT_NAME }}
         committer_email: ${{ secrets.GIT_EMAIL }}
-        message: "${{ env.NIXPKGS_NAME }}: ${{ env.NIXPKGS_VER_OLD }} -> ${{ env.NIXPKGS_VER_NEW }}"
-        new_branch: ${{ env.NIXPKGS_NAME }}-${{ env.NIXPKGS_VER_NEW }}-${{ github.run_id }}
+        message: "${{ env.NIXPKGS_NAME }}: ${{ env.NIXPKGS_VER_OLD }} -> ${{ env.NIXPKGS_VER_NEW }}, fusumaPlugins: init"
+        new_branch: ${{ env.NIXPKGS_NAME }}-${{ env.NIXPKGS_VER_NEW }}-with-plugins-${{ github.run_id }}
         github_token: ${{ secrets.PAT }}
