@@ -11,8 +11,8 @@ env:
   NIXPKGS_DIR: "./pkgs/tools/inputmethods/fusuma"
 
 jobs:
-  nixpkgs-fusuma-updater:
-    name: Fusuma Updater
+  fusuma-updater:
+    name: Fusuma - Updater
     runs-on: ubuntu-latest
     steps:
     - name: Install Nix
