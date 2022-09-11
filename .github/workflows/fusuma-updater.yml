@@ -48,3 +48,4 @@ jobs:
         committer_email: ${{ secrets.GIT_EMAIL }}
         message: "${{ env.NIXPKGS_NAME }}: ${{ env.NIXPKGS_VER_OLD }} -> ${{ env.NIXPKGS_VER_NEW }}"
         new_branch: ${{ env.NIXPKGS_NAME }}-${{ env.NIXPKGS_VER_NEW }}-${{ github.run_id }}
+        github_token: ${{ secrets.PAT }}
