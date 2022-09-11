@@ -1,0 +1,56 @@
+name: "Fusuma With Plugins Test"
+on:
+  workflow_dispatch:
+  
+env:
+  NIXPKGS_REPO: "LazyGeniusMan/nixpkgs"
+  NIXPKGS_BRANCH: "fusuma-2.4.1-with-plugins-3031453920"
+  NIXPKGS_NAME: "fusuma"
+  NIXPKGS_VER_OLD: "1.3.0"
+  NIXPKGS_VER_NEW: "2.4.1"
+  NIXPKGS_DIR: "./pkgs/tools/inputmethods/fusuma"
+
+jobs:
+  fusuma-with-plugins:
+    name: Fusuma With Plugins Test
+    runs-on: ubuntu-latest
+    steps:
+    - name: Install Nix
+      uses: cachix/install-nix-action@v17
+      with:
+        nix_path: nixpkgs=channel:nixos-unstable
+    - name: Checkout
+      uses: actions/checkout@v3.0.2
+      with:
+        repository: ${{ env.NIXPKGS_REPO }}
+        ref: ${{ env.NIXPKGS_BRANCH }}
+        token: ${{ secrets.PAT }}
+        fetch-depth: 1
+    - name: Upload nixpkgs source
+      uses: actions/upload-artifact@v3.1.0
+      with:
+        name: nixpkgs-source-${{ env.NIXPKGS_NAME }}-${{ env.NIXPKGS_VER_NEW }}-with-plugins-${{ github.run_id }}
+        path: |
+          ${{ env.NIXPKGS_DIR }}/**
+    - name: Build fusumaPlugins.appmatcher
+      run: |
+        nix-build -A fusumaPlugins.appmatcher
+    - name: Build fusumaPlugins.keypress
+      run: |
+        nix-build -A fusumaPlugins.keypress
+    - name: Build fusumaPlugins.sendkey
+      run: |
+        nix-build -A fusumaPlugins.sendkey
+    - name: Build fusumaPlugins.tap
+      run: |
+        nix-build -A fusumaPlugins.tap
+    - name: Build fusumaPlugins.wmctrl
+      run: |
+        nix-build -A fusumaPlugins.wmctrl
+    - name: Get result full path
+      run: echo "NIXPKGS_RESULT=$(readlink result)" >> $GITHUB_ENV
+    - name: Upload nixpkgs result
+      uses: actions/upload-artifact@v3.1.0
+      with:
+        name: nixpkgs-result-${{ env.NIXPKGS_NAME }}-${{ env.NIXPKGS_VER_NEW }}-with-plugins-${{ github.run_id }}
+        path: ${{ env.NIXPKGS_RESULT }}
