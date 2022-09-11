@@ -246,7 +246,7 @@ jobs:
         }
         EOF
         cd ${{ github.workspace }}
-     name: Build fusuma-plugin-appmatcher
+    - name: Build fusuma-plugin-appmatcher
       run: |
         nix-build -A fusuma-plugin-appmatcher
     - name: Generate fusuma-plugin-keypress
