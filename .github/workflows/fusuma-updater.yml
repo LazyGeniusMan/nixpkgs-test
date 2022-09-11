@@ -16,31 +16,12 @@ jobs:
       uses: cachix/install-nix-action@v17
       with:
         nix_path: nixpkgs=channel:nixos-unstable
-    #- name: Install nixpkgs-update
-    #  run: |
-    #    nix-env \
-    #      --option extra-substituters 'https://nixpkgs-update.cachix.org/' \
-    #      --option extra-trusted-public-keys 'nixpkgs-update.cachix.org-1:6y6Z2JdoL3APdu6/+Iy8eZX2ajf09e4EE9SnxSML1W8=' \
-    #      -if https://github.com/ryantm/nixpkgs-update/archive/main.tar.gz
-    #- name: Install nixpkgs-update
-    #  run: |
-    #    nix-env -iA nixpkgs.niv
-    #    niv add ryantm/nixpkgs-update
-    #- name: Install nix-update
-    #  run: |
-    #    nix-env -f '<nixpkgs>' -iA nix-update
     - name: Checkout
       uses: actions/checkout@v3.0.2
       with:
         repository: NixOS/nixpkgs
         ref: master
         fetch-depth: 1
-    #- name: Test Updater
-    #  run: |
-    #    nixpkgs-update update "fusuma 1.3.0 2.4.1"
-    #- name: Test Updater
-    #  run: |
-    #    nix-update nixpkgs-review
     - name: Test Updater
       run: |
         cd ${{ env.NIXPKGS_DIR }}
