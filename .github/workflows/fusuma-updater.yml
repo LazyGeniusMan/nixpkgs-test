@@ -5,6 +5,7 @@ on:
 env:
   NIXPKGS_NAME: "fusuma"
   NIXPKGS_VER: "2.4.1"
+  NIXPKGS_DIR: "./pkgs/tools/inputmethods/fusuma"
 
 jobs:
   nixpkgs-fusuma:
@@ -42,15 +43,15 @@ jobs:
     #    nix-update nixpkgs-review
     - name: Test Updater
       run: |
-        cd pkgs/tools/inputmethods/fusuma
+        cd ${{ env.NIXPKGS_DIR }}
         nix-shell -p ruby bundix --run "bundix -l"
     - name: Upload nixpkgs source
       uses: actions/upload-artifact@v3.1.0
       with:
         name: nixpkgs-source-${{ env.NIXPKGS_NAME }}-${{ env.NIXPKGS_VER }}-${{ github.run_id }}
         path: |
-          ./Gemfile
-          ./Gemfile.lock
-          ./gemset.nix
-          ./default.nix
+          ${{ env.NIXPKGS_DIR }}/Gemfile
+          ${{ env.NIXPKGS_DIR }}/Gemfile.lock
+          ${{ env.NIXPKGS_DIR }}/gemset.nix
+          ${{ env.NIXPKGS_DIR }}/default.nix
         
