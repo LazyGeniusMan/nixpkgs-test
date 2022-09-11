@@ -31,4 +31,4 @@ jobs:
     #    nixpkgs-update update "fusuma 1.3.0 2.4.1"
     - name: Test Updater
       run: |
-        nix-update fusuma
+        nix-update nixpkgs-review
