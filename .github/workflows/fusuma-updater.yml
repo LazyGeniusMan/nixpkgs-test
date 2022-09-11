@@ -32,8 +32,8 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v3.0.2
       with:
-        repository: LazyGeniusMan/nixpkgs
-        ref: fusuma-test
+        repository: NixOS/nixpkgs
+        ref: master
         fetch-depth: 1
     #- name: Test Updater
     #  run: |
