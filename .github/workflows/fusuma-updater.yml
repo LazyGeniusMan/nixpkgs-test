@@ -24,6 +24,7 @@ jobs:
       with:
         repository: ${{ env.NIXPKGS_REPO }}
         ref: ${{ env.NIXPKGS_BRANCH }}
+        token: ${{ secrets.PAT }}
         fetch-depth: 1
     - name: Update
       run: |
