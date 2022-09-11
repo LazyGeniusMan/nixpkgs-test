@@ -162,7 +162,7 @@ jobs:
             nativeBuildInputs = [ makeWrapper ];
             
             postBuild = ''
-            wrapProgram "$out/bin/fusuma-appmatcher" \
+            wrapProgram "$out/bin/fusuma-keypress" \
               --prefix PATH : ${lib.makeBinPath [ libinput fusuma ]}
             '';
             
