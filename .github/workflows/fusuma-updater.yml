@@ -1,4 +1,4 @@
-name: "Fusuma Updater"
+name: "Fusuma - Updater"
 on:
   workflow_dispatch:
   
@@ -11,8 +11,8 @@ env:
   NIXPKGS_DIR: "./pkgs/tools/inputmethods/fusuma"
 
 jobs:
-  nixpkgs-fusuma-updater:
-    name: Fusuma Updater
+  fusuma-updater:
+    name: Fusuma - Updater
     runs-on: ubuntu-latest
     steps:
     - name: Install Nix
@@ -31,6 +31,12 @@ jobs:
         cd ${{ env.NIXPKGS_DIR }}
         nix-shell -p ruby bundix --run "bundler update"
         nix-shell -p ruby bundix --run "bundix -l"
+    - name: Build
+      run: |
+        cd ${{ github.workspace }}
+        nix-build -A ${{ env.NIXPKGS_NAME }}
+    - name: Get result full path
+      run: echo "NIXPKGS_RESULT=$(readlink result)" >> $GITHUB_ENV
     - name: Upload nixpkgs source
       uses: actions/upload-artifact@v3.1.0
       with:
@@ -40,6 +46,11 @@ jobs:
           ${{ env.NIXPKGS_DIR }}/Gemfile.lock
           ${{ env.NIXPKGS_DIR }}/gemset.nix
           ${{ env.NIXPKGS_DIR }}/default.nix
+    - name: Upload nixpkgs result
+      uses: actions/upload-artifact@v3.1.0
+      with:
+        name: nixpkgs-result-${{ env.NIXPKGS_NAME }}-${{ env.NIXPKGS_VER_NEW }}-${{ github.run_id }}
+        path: ${{ env.NIXPKGS_RESULT }}
     - name: Commit to new branch
       uses: EndBug/add-and-commit@v9.1.0
       with:
