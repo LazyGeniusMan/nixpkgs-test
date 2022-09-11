@@ -33,7 +33,7 @@ jobs:
       run: |
         mkdir -p ${{ env.NIXPKGS_DIR }}/fusuma
         cd ${{ env.NIXPKGS_DIR }}
-        cat <</EOF > default.nix
+        cat <<\EOF > default.nix
         { lib, bundlerApp, bundlerUpdateScript, makeWrapper, libinput }:
 
         bundlerApp {
@@ -60,7 +60,7 @@ jobs:
         }
         EOF
         cd fusuma
-        cat <</EOF > Gemfile
+        cat <<\EOF > Gemfile
         source 'https://rubygems.org'
         gem "fusuma"
         EOF
