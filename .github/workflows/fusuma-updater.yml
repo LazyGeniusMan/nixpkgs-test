@@ -3,6 +3,8 @@ on:
   workflow_dispatch:
   
 env:
+  NIXPKGS_REPO: "LazyGeniusMan/nixpkgs"
+  NIXPKGS_BRANCH: "master"
   NIXPKGS_NAME: "fusuma"
   NIXPKGS_VER: "2.4.1"
   NIXPKGS_DIR: "./pkgs/tools/inputmethods/fusuma"
@@ -19,12 +21,13 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v3.0.2
       with:
-        repository: NixOS/nixpkgs
-        ref: master
+        repository: ${{ env.NIXPKGS_REPO }}
+        ref: ${{ env.NIXPKGS_BRANCH }}
         fetch-depth: 1
-    - name: Test Updater
+    - name: Update
       run: |
         cd ${{ env.NIXPKGS_DIR }}
+        nix-shell -p ruby bundix --run "bundler update"
         nix-shell -p ruby bundix --run "bundix -l"
     - name: Upload nixpkgs source
       uses: actions/upload-artifact@v3.1.0
