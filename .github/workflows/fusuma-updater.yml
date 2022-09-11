@@ -33,7 +33,7 @@ jobs:
         nix-shell -p ruby bundix --run "bundix -l"
     - name: Build
       run: |
-        cd ${{ env.GITHUB_WORKSPACE }}
+        cd ${{ github.workspace }}
         nix-build -A ${{ env.NIXPKGS_NAME }}
     - name: Get result full path
       run: echo "NIXPKGS_RESULT=$(readlink result)" >> $GITHUB_ENV
