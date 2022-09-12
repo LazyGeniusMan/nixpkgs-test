@@ -1,0 +1,43 @@
+name: "linux-wifi-hotspot Test"
+on:
+  workflow_dispatch:
+  
+env:
+  NIXPKGS_REPO: "LazyGeniusMan/nixpkgs"
+  NIXPKGS_BRANCH: "linux-wifi-hotspot-fix"
+  NIXPKGS_NAME: "linux-wifi-hotspot"
+  NIXPKGS_VER: "4.4.0"
+  NIXPKGS_DIR: "./pkgs/os-specific/linux/linux-wifi-hotspot"
+
+jobs:
+  linux-wifi-hotspot:
+    name: linux-wifi-hotspot Test
+    runs-on: ubuntu-latest
+    steps:
+    - name: Install Nix
+      uses: cachix/install-nix-action@v17
+      with:
+        nix_path: nixpkgs=channel:nixos-unstable
+    - name: Checkout
+      uses: actions/checkout@v3.0.2
+      with:
+        repository: ${{ env.NIXPKGS_REPO }}
+        ref: ${{ env.NIXPKGS_BRANCH }}
+        token: ${{ secrets.PAT }}
+        fetch-depth: 1
+    - name: Upload nixpkgs source
+      uses: actions/upload-artifact@v3.1.0
+      with:
+        name: nixpkgs-source-${{ env.NIXPKGS_NAME }}-${{ env.NIXPKGS_VER }}-with-plugins-${{ github.run_id }}
+        path: |
+          ${{ env.NIXPKGS_DIR }}/**
+    - name: Build linux-wifi-hotspot
+      run: |
+        nix-build -A linux-wifi-hotspot
+    - name: Get result full path
+      run: echo "NIXPKGS_RESULT=$(readlink result)" >> $GITHUB_ENV
+    - name: Upload nixpkgs result
+      uses: actions/upload-artifact@v3.1.0
+      with:
+        name: nixpkgs-result-${{ env.NIXPKGS_NAME }}-${{ env.NIXPKGS_VER }}-${{ github.run_id }}
+        path: /nix/store/**${{ env.NIXPKGS_NAME }}**
